@@ -1,5 +1,8 @@
+import sys
+sys.path.append(".")
+
 from machine import Pin, I2C, ADC
-from ssd1306 import SSD1306_I2C
+from src.ssd1306 import SSD1306_I2C
 import dht
 import time
 
