@@ -32,7 +32,8 @@ h_history:   list  = []
 
 print("Teste")
 
-while True:
+ITERATIONS = 10
+for _ in range(ITERATIONS):
 
     dht22.measure()
     temperature = dht22.temperature() # reads within range -40°C - 80°C
@@ -78,4 +79,4 @@ while True:
 
     oled.show()
 
-    time.sleep(1)
+    time.sleep(0.5)
