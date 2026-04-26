@@ -78,4 +78,4 @@ while True:
 
     oled.show()
 
-    time.sleep(0.5)
+    time.sleep(1)
