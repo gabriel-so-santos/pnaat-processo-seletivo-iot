@@ -1,1 +1,2 @@
 mpremote
+micropython-esp32-stubs
