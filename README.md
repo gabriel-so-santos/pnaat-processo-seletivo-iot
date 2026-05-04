@@ -1,108 +1,138 @@
-# Processo Seletivo – Intensivo Maker | IoT
-## Etapa Prática – Sistemas Embarcados
+# Processo Seletivo – Intensivo Maker | IoT  
+## Etapa Prática – Sistemas Embarcados  
 
 ---
 
-### 👤 Identificação 
+### 👤 Identificação  
 
-- **Nome completo:** Gabriel Souza Santos
-- **GitHub:** https://github.com/gabriel-so-santos
-
----
-
-## 1️⃣ Visão Geral da Solução
-
-O projeto consiste em um sistema embarcado simulado para monitoramento de temperatura e umidade utilizando o sensor
-DHT22. O sistema permite ao usuário definir dinamicamente um limite de temperatura por meio de um potenciômetro,
-possibilitando adaptação em tempo real conforme a necessidade.
-
-As leituras são processadas e exibidas em um display OLED, incluindo:
-
-temperatura atual
-umidade relativa do ar
-limite configurado
-variação entre leituras consecutivas
-
-Além disso, o sistema mantém um histórico limitado das medições em buffers internos, permitindo o cálculo de diferenças
-entre valores recentes sem crescimento indefinido de memória. Um LED é utilizado como atuador, sendo acionado sempre que
-a temperatura ultrapassa o limite definido.
+- **Nome completo:** Gabriel Souza Santos  
+- **GitHub:** https://github.com/gabriel-soantos  
+- **Projeto no WOKWI:** https://wokwi.com/projects/462374093468124161
 
 ---
 
-## 2️⃣ Arquitetura do Sistema Embarcado
+## 1️⃣ Visão Geral da Solução  
 
-O sistema segue um modelo de execução sequencial baseado em iterações, simulando o comportamento de um loop embarcado.
+O projeto consiste em um sistema embarcado simulado para monitoramento ambiental utilizando ESP32.
+O sistema realiza leitura de temperatura e umidade através do sensor DHT22, permitindo configuração dinâmica de um
+limite de temperatura via potenciômetro (ADC).
 
-A cada ciclo de execução, as seguintes etapas são realizadas:
+As informações são processadas em tempo real e exibidas em um display OLED SSD1306, incluindo:
 
-**Aquisição de dados**
-- Leitura de temperatura e umidade via sensor DHT22
-- Leitura do valor analógico do potenciômetro via ADC
+- Temperatura atual  
+- Umidade relativa do ar  
+- Limite de temperatura configurado  
+- Variação entre leituras consecutivas  
+- Tendência de comportamento das variáveis (+, -, =, ~)  
 
-**Processamento**
-- Conversão do valor do potenciômetro para um limite de temperatura dentro do intervalo do sensor (-40°C a 80°C)
-- Cálculo da variação (delta) em relação à última leitura armazenada
+Além disso, o sistema mantém um histórico eficiente de medições utilizando um **buffer circular (O(1))**, permitindo
+análise de variação sem crescimento de memória.
 
-**Controle**
-- Comparação da temperatura atual com o limite definido
-- Acionamento ou desligamento do LED conforme a condição
-
-**Gerenciamento de histórico**
-- Armazenamento das leituras em buffers limitados (FIFO)
-- Remoção dos valores mais antigos quando o limite máximo é atingido
-
-**Saída**
-- Atualização do display OLED com todas as informações relevantes
+Um LED é utilizado como atuador, sendo acionado quando a temperatura ultrapassa o limite configurado.
 
 ---
 
-## 3️⃣ Componentes Utilizados na Simulação
+## 2️⃣ Arquitetura do Sistema Embarcado  
 
-- **Sensor DHT22:**
-Responsável pela medição de temperatura e umidade do ambiente.
+O sistema segue um modelo de execução sequencial baseado em loop com temporização não bloqueante.
 
-- **Potenciômetro (ADC):**
-Utilizado como interface de entrada para definição dinâmica do limite de temperatura.
+A cada ciclo, o fluxo é dividido em etapas bem definidas:
 
-- **Display OLED SSD1306:**
-Responsável pela exibição dos dados do sistema em tempo real.
+### 🔹 Aquisição de Dados
+- Leitura de temperatura e umidade via DHT22  
+- Leitura do potenciômetro via ADC  
 
-- **LED:**
-Atua como sinalizador visual de alerta quando a temperatura excede o limite configurado.
+### 🔹 Processamento
+- Mapeamento do ADC para faixa de temperatura (-40°C a 80°C)  
+- Cálculo da variação entre leituras consecutivas  
+- Análise de tendência (increasing, decreasing, stable, oscillation)  
 
-- **Microcontrolador ESP32 (simulado no Wokwi):**
-Executa a lógica principal do sistema e integra todos os componentes. 
+### 🔹 Controle
+- Comparação da temperatura atual com o limite definido  
+- Ativação/desativação do LED conforme condição  
 
----
+### 🔹 Histórico
+- Armazenamento em buffer circular (estrutura O(1))  
+- Manutenção de tamanho fixo em memória  
 
-## 4️⃣ Decisões Técnicas Relevantes
-
-- **Mapeamento do potenciômetro para faixa real do sensor:**
-O valor analógico (0–4095) foi convertido para o intervalo de temperatura suportado pelo DHT22 (-40°C a 80°C),
-garantindo coerência entre entrada do usuário e medições.
-
-- **Uso de buffers limitados (FIFO):**
-As leituras são armazenadas em listas com tamanho máximo definido, evitando crescimento indefinido de memória.
-
-- **Cálculo de variação entre leituras:**
-A diferença entre valores consecutivos foi incluída para fornecer uma visão mais dinâmica do comportamento das medições.
-
-- **Uso de temporização simples (delay):**
-Foi adotado um modelo de temporização baseado em atraso fixo para simplificar a implementação no ambiente de simulação.
+### 🔹 Apresentação
+- Atualização do display OLED em tempo real  
+- Exibição de valores, deltas e tendências  
 
 ---
 
-## 5️⃣ Resultados Obtidos
+## 3️⃣ Componentes Utilizados na Simulação  
+
+- **Sensor DHT22:**  
+  Responsável pela medição de temperatura e umidade do ambiente.
+
+- **Potenciômetro (ADC):**  
+  Interface analógica para ajuste dinâmico do limite de temperatura.
+
+- **Display OLED SSD1306:**  
+  Exibição dos dados em tempo real.
+
+- **LED:**  
+  Atuador visual de alerta térmico.
+
+- **ESP32 (simulado no Wokwi):**  
+  Plataforma de execução do sistema embarcado.
+
+---
+
+## 4️⃣ Melhorias Arquiteturais Implementadas  
+
+### 🔹 Modularização do sistema  
+O projeto foi refatorado em módulos independentes:
+
+- `analysis.py` → cálculo de tendências  
+- `display.py` → abstração da interface OLED  
+- `circular_buffer.py` → estrutura de dados O(1)  
+- `main.py` → orquestração do sistema  
+
+---
+
+### 🔹 Buffer circular (O(1))  
+Substituição de listas dinâmicas por estrutura circular fixa, garantindo:
+
+- Inserção O(1)  
+- Uso controlado de memória  
+- Sem realocação de lista  
+
+---
+
+### 🔹 Análise de tendência  
+Foi adicionada lógica para identificar comportamento das variáveis:
+
+- `+` → crescente  
+- `-` → decrescente  
+- `=` → estável  
+- `~` → oscilação  
+
+---
+
+### 🔹 Separação de responsabilidades  
+O sistema foi reorganizado seguindo princípios de engenharia de software:
+
+- Sensor layer  
+- Processing layer  
+- Control layer  
+- Presentation layer  
+
+---
+
+## 5️⃣ Resultados Obtidos  
 
 O sistema foi capaz de:
 
-- Realizar leituras consistentes de temperatura e umidade
-- Permitir ajuste dinâmico do limite de temperatura via potenciômetro
-- Acionar corretamente o LED quando o limite é ultrapassado
-- Exibir todas as informações relevantes no display OLED em tempo real
-- Calcular e apresentar a variação entre leituras consecutivas
+- Realizar leituras consistentes de sensores  
+- Permitir ajuste dinâmico de limite via potenciômetro  
+- Detectar tendências de variação das variáveis  
+- Acionar corretamente o LED de alerta  
+- Exibir dados completos em tempo real no OLED  
+- Manter histórico eficiente com uso de buffer circular  
 
-Durante a simulação no Wokwi, o comportamento do sistema se manteve estável e condizente com os requisitos propostos.
+Durante a simulação no Wokwi, o comportamento se manteve estável e coerente com os requisitos definidos.
 
 ---
 
@@ -114,7 +144,8 @@ iterações. O intervalo de atualização também foi reduzido para garantir a e
 Atualmente, os dados históricos são mantidos apenas em memória volátil, sendo descartados conforme o buffer atinge seu
 limite máximo. Como melhorias futuras, poderiam ser implementados:
 
-- Persistência de dados (armazenamento externo ou arquivo)
+- Persistência de dados
 - Tratamento de falhas de leitura do sensor
-- Substituição do delay por temporização não bloqueante
-- Estrutura de dados mais robusta para armazenamento das medições
+- Comunicação via MQTT ou Wi-Fi (IoT real)  
+- Substituição do loop por máquina de estados  
+- Logging estruturado de métricas
