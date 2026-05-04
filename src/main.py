@@ -1,7 +1,10 @@
 from machine import Pin, I2C, ADC
 from ssd1306 import SSD1306_I2C
+from circular_buffer import CircularBuffer
 import dht
 import time
+
+print("Teste")
 
 OLED_WIDTH: int = 128
 OLED_HEIGHT: int = 64
@@ -28,25 +31,21 @@ humidity: float = 0.0
 t_diff: float = 0.0
 h_diff: float = 0.0
 
-t_history: list = []
-h_history: list = []
-
-print("Teste")
+history = CircularBuffer(size=MAX_HISTORY_SIZE)
 
 last_update = time.ticks_ms()
 time_now = time.ticks_ms()
 
 while True:
-
     time_now = time.ticks_ms()
 
     if time.ticks_diff(time_now, last_update) >= READ_INTERVAL:
         last_update = time_now
 
         dht22.measure()
-        temperature = dht22.temperature()  # reads within range -40°C - 80°C
-        humidity = dht22.humidity()  # reads within range 0% - 100%
-        pot_value = pot_adc.read()  # reads within range 0000 - 4095
+        temperature = dht22.temperature()  # reads within range -40°C .. 80°C
+        humidity = dht22.humidity()        # reads within range    0% .. 100%
+        pot_value = pot_adc.read()         # reads within range  0000 .. 4095
 
         t_limit = pot_value * 120 / 4096 - 40
 
@@ -55,19 +54,15 @@ while True:
         else:
             led.value(0)
 
-        if len(t_history) >= MAX_HISTORY_SIZE:
-            t_history.pop(0)
-            h_history.pop(0)
+        last_insertion: tuple[float, float] = history.last()
+        history.push((temperature, humidity))
 
-        if len(t_history) == 0:
+        if last_insertion is None:
             t_diff = 0
             h_diff = 0
         else:
-            t_diff = temperature - t_history[-1]
-            h_diff = humidity - h_history[-1]
-
-        t_history.append(temperature)
-        h_history.append(humidity)
+            t_diff = temperature - last_insertion[0]
+            h_diff = humidity - last_insertion[1]
 
         oled.fill(0)
 
