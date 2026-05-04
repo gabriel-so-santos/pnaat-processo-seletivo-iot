@@ -69,20 +69,14 @@ while True:
         t_history.append(temperature)
         h_history.append(humidity)
 
-        temperature = round(temperature, 2)
-        humidity = round(humidity, 2)
-        t_diff = round(t_diff, 2)
-        h_diff = round(h_diff, 2)
-        t_limit = round(t_limit, 2)
-
         oled.fill(0)
 
-        oled.text("T:" + str(temperature) + "C", 0, 0)
-        oled.text("H:" + str(humidity) + "%", 0, 16)
+        oled.text(f"T:{temperature:.1f}C", 0, 0)
+        oled.text(f"H:{humidity:.1f}%", 0, 16)
 
-        oled.text("(" + str(t_diff) + ")", 64, 0)
-        oled.text("(" + str(h_diff) + ")", 64, 16)
+        oled.text(f"d:{t_diff:.1f}", 64, 0)
+        oled.text(f"d:{h_diff:.1f}", 64, 16)
 
-        oled.text("lim:" + str(t_limit) + "C", 0, 54)
+        oled.text(f"lim:{t_limit:.1f}C", 0, 54)
 
         oled.show()
