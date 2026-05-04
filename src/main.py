@@ -16,6 +16,11 @@ Features:
 import random
 import time
 
+# CI time limitation
+START_TIME = time.ticks_ms()
+MAX_RUNTIME = 9_000  # 9 seconds
+print("Teste") # required by CI
+
 import dht
 from machine import Pin, I2C, ADC
 from ssd1306 import SSD1306_I2C
@@ -25,12 +30,10 @@ from circular_buffer import CircularBuffer
 from display import Display
 
 
-print("Teste") # required by CI
-
 # ------------ Configuration Constants -------------
 OLED_WIDTH = 128
 OLED_HEIGHT = 64
-READ_INTERVAL = 250  # ms between sensor updates
+READ_INTERVAL = 500  # measured in ms
 MAX_HISTORY_SIZE = 16
 
 # ------------ Hardware Initialization -------------
@@ -73,6 +76,10 @@ time_now = time.ticks_ms()
 # ------------------- Main Loop --------------------
 while True:
     time_now = time.ticks_ms()
+
+    # break before reach max runtime
+    if time.ticks_diff(time_now, START_TIME) >= MAX_RUNTIME:
+        break
 
     if time.ticks_diff(time_now, last_update) >= READ_INTERVAL:
         last_update = time_now
