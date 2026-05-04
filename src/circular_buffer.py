@@ -1,47 +1,62 @@
 class CircularBuffer:
-    def __init__(self, size):
-        # Pre-allocate a fixed-size list to avoid dynamic resizing
-        # Ensures O(1) insertion and predictable memory usage
+    """
+    Fixed-size circular buffer implementation.
+
+    Stores elements in a ring structure where new insertions
+    overwrite the oldest elements when capacity is reached.
+
+    Provides O(1) insertion and O(1) access to first/last elements.
+    """
+
+    def __init__(self, size: int):
+        """
+        Initialize the circular buffer.
+
+        Args:
+            size (int): Maximum number of elements the buffer can store.
+        """
+        # Pre-allocate fixed-size storage to ensure O(1) behavior
         self.buffer = [None] * size
 
-        # Maximum number of elements the buffer can hold
+        # Maximum capacity of the buffer
         self.size = size
 
-        # Points to the next position to be written
-        # Wraps around using modulo arithmetic
+        # Index of the next insertion position (wraps around)
         self.index = 0
 
-        # Tracks how many valid elements are currently stored
-        # Never exceeds 'size'
+        # Number of valid elements currently stored
         self.count = 0
 
     def push(self, value):
-        # Insert the new value at the current index
-        # If the buffer is full, this overwrites the oldest element
+        """
+        Insert a new value into the buffer.
+        If the buffer is full, the oldest value is overwritten.
+        """
+        # Store value at current write position
         self.buffer[self.index] = value
 
-        # Move index forward and wrap around if needed
+        # Advance index with circular wrap-around
         self.index = (self.index + 1) % self.size
 
-        # Increase count until it reaches the maximum size
+        # Increase count up to maximum capacity
         self.count = min(self.count + 1, self.size)
 
     def first(self):
-        # Return the oldest element in the buffer
-        # If empty, return None
+        """
+        Return the oldest element in the buffer (None if buffer is empty).
+        """
         if self.count == 0:
             return None
 
-        # The oldest element is located 'count' steps behind the current index
-        # Use modulo to correctly wrap around the buffer
+        # Oldest element is 'count' positions behind current index
         return self.buffer[(self.index - self.count) % self.size]
 
     def last(self):
-        # Return the most recently inserted element
-        # If empty, return None
+        """
+        Return the most recently inserted element (None if buffer is empty).
+        """
         if self.count == 0:
             return None
 
-        # The last inserted element is one position behind the current index
-        # (since index always points to the next write position)
+        # Last element is just before the current insertion index
         return self.buffer[(self.index - 1) % self.size]
